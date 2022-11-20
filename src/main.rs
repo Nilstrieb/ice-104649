@@ -77,7 +77,7 @@ mod fut {
         }
     }
 
-    impl<St, F> Stream for &Map<St, F>
+    impl<St, F> Stream for Map<St, F>
     where
         St: Stream,
         F: FnOnce1<St::Item>,
@@ -133,23 +133,3 @@ fn main() {
         }
     });
 }
-/*
-capture1 = CapturedPlace {
-    place: Place {
-        base_ty: std::result::Result<std::result::Result<std::string::String, _>, ()>,
-        base: Upvar(UpvarId(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) }, local_id: 40 };`b`;DefId(0:104 ~ ice_104649[7838]::main::{closure#1}::{closure#0}))),
-        projections: [Projection { ty: (), kind: Field(0, 1) }]
-    },
-    info: CaptureInfo { capture_kind_expr_id: Some(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) }, local_id: 45 }), path_expr_id: Some(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) }, local_id: 45 }), capture_kind: ByRef(ImmBorrow) },
-    mutability: Not, region: Some('_#8r)
-}
-capture2 = CapturedPlace {
-    place: Place {
-        base_ty: std::result::Result<std::result::Result<std::string::String, _>, ()>,
-        base: Upvar(UpvarId(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) },local_id: 40 };`b`;DefId(0:104 ~ ice_104649[7838]::main::{closure#1}::{closure#0}))),
-        projections: [Projection { ty: std::result::Result<std::string::String, _>, kind: Field(0, 0) }, Projection { ty: std::string::String, kind: Field(0, 0) }]
-    },
-    info: CaptureInfo { capture_kind_expr_id: Some(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) }, local_id: 45 }), path_expr_id: Some(HirId { owner: OwnerId { def_id: DefId(0:100 ~ ice_104649[7838]::main) }, local_id: 45 }), capture_kind: ByValue },
-    mutability: Not, region: None
-}
-*/
