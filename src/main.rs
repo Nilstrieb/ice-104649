@@ -11,7 +11,7 @@ impl<T> Project for Wrap<T> {
 pub trait Stream {
     type Item;
 
-    fn get_projected<Fut, F>(self, f: F)
+    fn get_projected<Fut, F>(self, f: F) -> Self::Item
     where
         F: FnMut(Self::Item) -> Fut,
         Self: Sized,
@@ -42,11 +42,19 @@ where
 }
 
 fn main() {
-    let proj = ProjectFnOutput(|| Wrap(Result::Ok(())));
+    let proj = ProjectFnOutput(|| {
+        Wrap(
+            // This is `Result<(), _1>` but since no type annotations are provided the tpye of _1 is unknown.
+            Ok(()),
+        )
+    });
+
     proj.get_projected(|b| async {
+        // The type of `b` is `Result<Result<(), _1>, ()> where _1 is unknown.
         match b {
             Ok(Ok(url)) => {}
             Err(e) => {}
+            // `e` has type _1.
             Ok(Err(e)) => {}
         }
     });
