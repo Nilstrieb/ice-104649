@@ -11,7 +11,7 @@ impl<T> Project for Wrap<T> {
 pub trait Stream {
     type Item;
 
-    fn async_match_on_projected<Fut, F>(self, f: F)
+    fn get_projected<Fut, F>(self, f: F)
     where
         F: FnMut(Self::Item) -> Fut,
         Self: Sized,
@@ -43,7 +43,7 @@ where
 
 fn main() {
     let proj = ProjectFnOutput(|| Wrap(Result::Ok(())));
-    proj.async_match_on_projected(|b| async {
+    proj.get_projected(|b| async {
         match b {
             Ok(Ok(url)) => {}
             Err(e) => {}
