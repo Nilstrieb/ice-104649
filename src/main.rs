@@ -1,5 +1,3 @@
-use fut::Stream;
-
 trait Project {
     type Assoc;
 }
