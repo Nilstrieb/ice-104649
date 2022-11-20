@@ -1,5 +1,4 @@
 use futures::{stream, StreamExt};
-use snafu::prelude::*;
 use std::time::{Duration, Instant};
 
 const REQUEST_COUNT: usize = 10;
@@ -38,7 +37,7 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug, Snafu)]
+#[derive(Debug)]
 struct Error;
 
 type Result<T, E = Error> = ::core::result::Result<T, E>;

@@ -9,4 +9,3 @@ edition = "2021"
 reqwest = { version = "0.11", features = ["json", "brotli", "gzip", "native-tls", "deflate"] }
 tokio = { version = "1", features = ["full"] }
 futures = "0.3.25"
-snafu = { version = "0.7.3", features = ["rust_1_61", "backtraces-impl-std"] }
