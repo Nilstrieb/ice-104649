@@ -25,7 +25,7 @@ mod fut {
     pub trait Stream {
         type Item;
 
-        fn map<T, F>(self, f: F) -> Map<Self, F>
+        fn map<T, F>(self, f: F) -> Map<F>
         where
             F: FnMut(Self::Item) -> T,
             Self: Sized,
@@ -68,10 +68,9 @@ mod fut {
         }
     }
 
-    impl<St, F> Stream for Map<F>
+    impl<F> Stream for Map<F>
     where
-        St: Stream,
-        F: FnOnce1<St::Item>,
+        F: FnOnce1<String>,
         F::Output: Future,
     {
         type Item = <F::Output as Future>::Output;
