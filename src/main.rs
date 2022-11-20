@@ -10,8 +10,6 @@ impl<T> Project for FutResult<T> {
     type Assoc = Result<T, ()>;
 }
 
-use crate::Project;
-
 pub trait Stream {
     type Item;
 
