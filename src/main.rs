@@ -54,7 +54,6 @@ fn main() {
         match b {
             Ok(Ok(url)) => {}
             Err(e) => {}
-            // `e` has type _1.
             Ok(Err(e)) => {}
         }
     });
