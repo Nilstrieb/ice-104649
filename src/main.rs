@@ -41,14 +41,6 @@ mod fut {
         {
             loop {}
         }
-
-        fn buffer_unordered(self) -> BufferUnordered<Self>
-        where
-            Self::Item: Future,
-            Self: Sized,
-        {
-            loop {}
-        }
     }
 
     pub struct Empty;
@@ -81,8 +73,9 @@ mod fut {
     where
         St: Stream,
         F: FnOnce1<St::Item>,
+        F::Output: Future,
     {
-        type Item = F::Output;
+        type Item = <F::Output as Future>::Output;
     }
 
     pub struct ForEach<St, Fut, F> {
@@ -103,27 +96,10 @@ mod fut {
             loop {}
         }
     }
-
-    pub struct BufferUnordered<St>
-    where
-        St: Stream,
-    {
-        stream: St,
-    }
-
-    impl<St> Stream for BufferUnordered<St>
-    where
-        St: Stream,
-        St::Item: Future,
-    {
-        type Item = <St::Item as Future>::Output;
-    }
 }
 
 fn main() {
-    let bodies = fut::Empty
-        .map(|url| FutResult(Result::Ok(url)))
-        .buffer_unordered();
+    let bodies = fut::Empty.map(|url| FutResult(Result::Ok(url)));
 
     bodies.for_each(|b| async {
         match b {
