@@ -67,7 +67,7 @@ mod fut {
     pub struct ForEach<St, Fut, F> {
         stream: St,
         f: F,
-        future: Option<Fut>,
+        future: Fut,
     }
 }
 
