@@ -1,3 +1,4 @@
+use fut::Stream;
 use std::{
     future::Future,
     pin::Pin,
@@ -18,7 +19,6 @@ pub fn spawn<T: Future>(future: T) -> JoinHandle<T::Output> {
     loop {}
 }
 
-use fut::StreamExt;
 mod fut {
     use std::{
         future::Future,
@@ -29,40 +29,7 @@ mod fut {
     pub trait Stream {
         type Item;
         fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>>;
-    }
 
-    #[derive(Debug, Clone)]
-    pub struct Iter<I> {
-        iter: I,
-    }
-
-    pub fn iter<I>(i: I) -> Iter<I::IntoIter>
-    where
-        I: IntoIterator,
-    {
-        Iter {
-            iter: i.into_iter(),
-        }
-    }
-
-    impl<I> Stream for Iter<I>
-    where
-        I: Iterator,
-    {
-        type Item = I::Item;
-
-        fn poll_next(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<Option<I::Item>> {
-            Poll::Ready(self.iter.next())
-        }
-    }
-
-    impl<T: ?Sized> StreamExt for T where T: Stream {}
-
-    fn assert_future<F, T>(t: T) -> T {
-        t
-    }
-
-    pub trait StreamExt: Stream {
         fn map<T, F>(self, f: F) -> Map<Self, F>
         where
             F: FnMut(Self::Item) -> T,
@@ -89,7 +56,30 @@ mod fut {
         }
     }
 
-    #[must_use = "streams do nothing unless polled"]
+    pub struct Iter<I> {
+        iter: I,
+    }
+
+    pub fn iter<I>(i: I) -> Iter<I::IntoIter>
+    where
+        I: IntoIterator,
+    {
+        Iter {
+            iter: i.into_iter(),
+        }
+    }
+
+    impl<I> Stream for Iter<I>
+    where
+        I: Iterator,
+    {
+        type Item = I::Item;
+
+        fn poll_next(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<Option<I::Item>> {
+            loop {}
+        }
+    }
+
     pub struct Map<St, F> {
         stream: St,
         f: F,
@@ -118,27 +108,14 @@ mod fut {
     {
         type Output = R;
         fn call_once(self, arg: A) -> R {
-            self(arg)
-        }
-    }
-
-    pub trait FnMut1<A>: FnOnce1<A> {
-        fn call_mut(&mut self, arg: A) -> Self::Output;
-    }
-
-    impl<T, A, R> FnMut1<A> for T
-    where
-        T: FnMut(A) -> R,
-    {
-        fn call_mut(&mut self, arg: A) -> R {
-            self(arg)
+            loop {}
         }
     }
 
     impl<St, F> Stream for &Map<St, F>
     where
         St: Stream,
-        F: FnMut1<St::Item>,
+        F: FnOnce1<St::Item>,
     {
         type Item = F::Output;
 
