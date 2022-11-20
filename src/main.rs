@@ -25,14 +25,6 @@ mod fut {
     pub trait Stream {
         type Item;
 
-        fn map<T, F>(self, f: F) -> Map<F>
-        where
-            F: FnMut(Self::Item) -> T,
-            Self: Sized,
-        {
-            loop {}
-        }
-
         fn for_each<Fut, F>(self, f: F) -> ForEach<Self, Fut, F>
         where
             F: FnMut(Self::Item) -> Fut,
