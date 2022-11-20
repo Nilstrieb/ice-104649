@@ -43,15 +43,14 @@ mod fut {
         }
     }
 
-    pub struct Empty;
-
-    impl Stream for Empty {
-        type Item = String;
+    pub fn map<T, F>(f: F) -> Map<F>
+    where
+        F: FnMut(String) -> T,
+    {
+        loop {}
     }
 
-    pub struct Map<F> {
-        f: F,
-    }
+    pub struct Map<F>(F);
 
     pub trait FnOnce1<A> {
         type Output;
@@ -97,7 +96,7 @@ mod fut {
 }
 
 fn main() {
-    let bodies = fut::Empty.map(|url| FutResult(Result::Ok(url)));
+    let bodies = fut::map(|url| FutResult(Result::Ok(url)));
 
     bodies.for_each(|b| async {
         match b {
