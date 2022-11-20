@@ -22,57 +22,19 @@ use fut::StreamExt;
 mod fut {
     use std::{
         future::Future,
-        num::NonZeroUsize,
-        ops::DerefMut,
         pin::Pin,
         task::{Context, Poll},
     };
 
-    #[must_use = "streams do nothing unless polled"]
     pub trait Stream {
         type Item;
         fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>>;
-        #[inline]
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            (0, None)
-        }
-    }
-
-    impl<S: ?Sized + Stream + Unpin> Stream for &mut S {
-        type Item = S::Item;
-
-        fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            S::poll_next(Pin::new(&mut **self), cx)
-        }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            (**self).size_hint()
-        }
-    }
-
-    impl<P> Stream for Pin<P>
-    where
-        P: DerefMut + Unpin,
-        P::Target: Stream,
-    {
-        type Item = <P::Target as Stream>::Item;
-
-        fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            self.get_mut().as_mut().poll_next(cx)
-        }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            (**self).size_hint()
-        }
     }
 
     #[derive(Debug, Clone)]
-    #[must_use = "streams do nothing unless polled"]
     pub struct Iter<I> {
         iter: I,
     }
-
-    impl<I> Unpin for Iter<I> {}
 
     pub fn iter<I>(i: I) -> Iter<I::IntoIter>
     where
@@ -92,10 +54,6 @@ mod fut {
         fn poll_next(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<Option<I::Item>> {
             Poll::Ready(self.iter.next())
         }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            self.iter.size_hint()
-        }
     }
 
     impl<T: ?Sized> StreamExt for T where T: Stream {}
@@ -110,7 +68,7 @@ mod fut {
             F: FnMut(Self::Item) -> T,
             Self: Sized,
         {
-            Map::new(self, f)
+            loop {}
         }
 
         fn for_each<Fut, F>(self, f: F) -> ForEach<Self, Fut, F>
@@ -119,7 +77,7 @@ mod fut {
             Fut: Future<Output = ()>,
             Self: Sized,
         {
-            assert_future::<(), _>(ForEach::new(self, f))
+            loop {}
         }
 
         fn buffer_unordered(self, n: impl Into<Option<usize>>) -> BufferUnordered<Self>
@@ -127,7 +85,7 @@ mod fut {
             Self::Item: Future,
             Self: Sized,
         {
-            BufferUnordered::new(self, n.into())
+            loop {}
         }
     }
 
@@ -135,12 +93,6 @@ mod fut {
     pub struct Map<St, F> {
         stream: St,
         f: F,
-    }
-
-    impl<St, F> Map<St, F> {
-        pub(crate) fn new(stream: St, f: F) -> Self {
-            Self { stream, f }
-        }
     }
 
     impl<St, F> Stream for Map<St, F>
@@ -152,10 +104,6 @@ mod fut {
 
         fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
             loop {}
-        }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            self.stream.size_hint()
         }
     }
 
@@ -197,31 +145,12 @@ mod fut {
         fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
             loop {}
         }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
-            self.stream.size_hint()
-        }
     }
 
     pub struct ForEach<St, Fut, F> {
         stream: St,
         f: F,
         future: Option<Fut>,
-    }
-
-    impl<St, Fut, F> ForEach<St, Fut, F>
-    where
-        St: Stream,
-        F: FnMut(St::Item) -> Fut,
-        Fut: Future<Output = ()>,
-    {
-        pub(super) fn new(stream: St, f: F) -> Self {
-            Self {
-                stream,
-                f,
-                future: None,
-            }
-        }
     }
 
     impl<St, Fut, F> Future for ForEach<St, Fut, F>
@@ -242,20 +171,6 @@ mod fut {
         St: Stream,
     {
         stream: St,
-        max: Option<NonZeroUsize>,
-    }
-
-    impl<St> BufferUnordered<St>
-    where
-        St: Stream,
-        St::Item: Future,
-    {
-        pub(super) fn new(stream: St, n: Option<usize>) -> Self {
-            Self {
-                stream: stream,
-                max: n.and_then(NonZeroUsize::new),
-            }
-        }
     }
 
     impl<St> Stream for BufferUnordered<St>
@@ -266,10 +181,6 @@ mod fut {
         type Item = <St::Item as Future>::Output;
 
         fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            loop {}
-        }
-
-        fn size_hint(&self) -> (usize, Option<usize>) {
             loop {}
         }
     }
