@@ -1,10 +1,6 @@
-use std::marker::PhantomData;
-
 use futures::{stream, Future, StreamExt};
 
-pub struct JoinHandle<T> {
-    _p: PhantomData<T>,
-}
+pub struct JoinHandle<T>(T);
 
 impl<T> Future for JoinHandle<T> {
     type Output = Result<T, ()>;
@@ -17,10 +13,7 @@ impl<T> Future for JoinHandle<T> {
     }
 }
 
-pub fn spawn<T>(future: T) -> JoinHandle<T::Output>
-where
-    T: Future,
-{
+pub fn spawn<T: Future>(future: T) -> JoinHandle<T::Output> {
     loop {}
 }
 
