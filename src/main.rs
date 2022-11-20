@@ -2,9 +2,9 @@ trait Project {
     type Assoc;
 }
 
-pub struct FutResult<T>(T);
+pub struct Wrap<T>(T);
 
-impl<T> Project for FutResult<T> {
+impl<T> Project for Wrap<T> {
     type Assoc = Result<T, ()>;
 }
 
@@ -29,27 +29,27 @@ where
 
 pub struct Map<F>(F);
 
-pub trait FnOnce1<A> {
-    type Output;
-}
-
-impl<T, A, R> FnOnce1<A> for T
-where
-    T: FnOnce(A) -> R,
-{
-    type Output = R;
-}
-
 impl<F> Stream for Map<F>
 where
-    F: FnOnce1<()>,
+    F: FnOnce1,
     F::Output: Project,
 {
     type Item = <F::Output as Project>::Assoc;
 }
 
+pub trait FnOnce1 {
+    type Output;
+}
+
+impl<T, R> FnOnce1 for T
+where
+    T: FnOnce(()) -> R,
+{
+    type Output = R;
+}
+
 fn main() {
-    let bodies = map(|url| FutResult(Result::Ok(url)));
+    let bodies = map(|url| Wrap(Result::Ok(url)));
 
     bodies.for_each(|b| async {
         match b {
