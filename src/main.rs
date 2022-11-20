@@ -20,13 +20,6 @@ pub trait Stream {
     }
 }
 
-pub fn map<T, F>(f: F) -> Map<F>
-where
-    F: FnMut() -> T,
-{
-    loop {}
-}
-
 pub struct Map<F>(F);
 
 impl<F> Stream for Map<F>
@@ -49,7 +42,7 @@ where
 }
 
 fn main() {
-    let bodies = map(|| Wrap(Result::Ok(())));
+    let bodies = Map(|| Wrap(Result::Ok(())));
 
     bodies.for_each(|b| async {
         match b {
