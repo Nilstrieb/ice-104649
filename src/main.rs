@@ -11,7 +11,7 @@ impl<T> Project for Wrap<T> {
 pub trait Stream {
     type Item;
 
-    fn for_each<Fut, F>(self, f: F)
+    fn async_match_on_projected<Fut, F>(self, f: F)
     where
         F: FnMut(Self::Item) -> Fut,
         Self: Sized,
@@ -20,21 +20,21 @@ pub trait Stream {
     }
 }
 
-pub struct Map<F>(F);
+pub struct ProjectFnOutput<F>(F);
 
-impl<F> Stream for Map<F>
+impl<F> Stream for ProjectFnOutput<F>
 where
-    F: FnOnce1,
+    F: GetFnOutput,
     F::Output: Project,
 {
     type Item = <F::Output as Project>::Assoc;
 }
 
-pub trait FnOnce1 {
+pub trait GetFnOutput {
     type Output;
 }
 
-impl<T, R> FnOnce1 for T
+impl<T, R> GetFnOutput for T
 where
     T: FnOnce() -> R,
 {
@@ -42,9 +42,8 @@ where
 }
 
 fn main() {
-    let bodies = Map(|| Wrap(Result::Ok(())));
-
-    bodies.for_each(|b| async {
+    let proj = ProjectFnOutput(|| Wrap(Result::Ok(())));
+    proj.async_match_on_projected(|b| async {
         match b {
             Ok(Ok(url)) => {}
             Err(e) => {}
