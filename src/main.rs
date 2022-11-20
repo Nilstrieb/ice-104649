@@ -5,12 +5,12 @@ const REQUEST_COUNT: usize = 10;
 const CONCURRENT_REQUESTS: usize = 1_000;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<(), Error> {
     let client = reqwest::Client::builder()
         .build()
         .unwrap();
 
-    let urls = vec![String::from("http://example.com"); REQUEST_COUNT];
+    let urls = vec![String::from("http://example.com")];
 
     // Concurrent Requests
     let bodies = stream::iter(urls)
@@ -37,7 +37,4 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-#[derive(Debug)]
 struct Error;
-
-type Result<T, E = Error> = ::core::result::Result<T, E>;
