@@ -13,7 +13,6 @@ name = "futures"
 version = "0.4.0-alpha.0"
 dependencies = [
  "futures-core",
- "futures-executor",
  "futures-io",
  "futures-sink",
  "futures-task",
@@ -23,15 +22,6 @@ dependencies = [
 [[package]]
 name = "futures-core"
 version = "1.0.0-alpha.0"
-
-[[package]]
-name = "futures-executor"
-version = "0.4.0-alpha.0"
-dependencies = [
- "futures-core",
- "futures-task",
- "futures-util",
-]
 
 [[package]]
 name = "futures-io"
