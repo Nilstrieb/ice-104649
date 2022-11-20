@@ -11,11 +11,7 @@ impl<T> Project for FutResult<T> {
 }
 
 mod fut {
-    use std::{
-        future::Future,
-        pin::Pin,
-        task::{Context, Poll},
-    };
+    use std::future::Future;
 
     use crate::Project;
 
