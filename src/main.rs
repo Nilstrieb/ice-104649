@@ -28,7 +28,6 @@ mod fut {
 
     pub trait Stream {
         type Item;
-        fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>>;
 
         fn map<T, F>(self, f: F) -> Map<Self, F>
         where
@@ -74,27 +73,11 @@ mod fut {
         I: Iterator,
     {
         type Item = I::Item;
-
-        fn poll_next(mut self: Pin<&mut Self>, _: &mut Context<'_>) -> Poll<Option<I::Item>> {
-            loop {}
-        }
     }
 
     pub struct Map<St, F> {
         stream: St,
         f: F,
-    }
-
-    impl<St, F> Stream for Map<St, F>
-    where
-        St: Stream,
-        F: FnMut(St::Item),
-    {
-        type Item = F::Output;
-
-        fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            loop {}
-        }
     }
 
     pub trait FnOnce1<A> {
@@ -118,10 +101,6 @@ mod fut {
         F: FnOnce1<St::Item>,
     {
         type Item = F::Output;
-
-        fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            loop {}
-        }
     }
 
     pub struct ForEach<St, Fut, F> {
@@ -156,10 +135,6 @@ mod fut {
         St::Item: Future,
     {
         type Item = <St::Item as Future>::Output;
-
-        fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-            loop {}
-        }
     }
 }
 
