@@ -22,7 +22,7 @@ pub trait Stream {
 
 pub fn map<T, F>(f: F) -> Map<F>
 where
-    F: FnMut(String) -> T,
+    F: FnMut(()) -> T,
 {
     loop {}
 }
@@ -42,7 +42,7 @@ where
 
 impl<F> Stream for Map<F>
 where
-    F: FnOnce1<String>,
+    F: FnOnce1<()>,
     F::Output: Project,
 {
     type Item = <F::Output as Project>::Assoc;
