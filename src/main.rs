@@ -22,7 +22,7 @@ pub trait Stream {
 
 pub fn map<T, F>(f: F) -> Map<F>
 where
-    F: FnMut(()) -> T,
+    F: FnMut() -> T,
 {
     loop {}
 }
@@ -43,13 +43,13 @@ pub trait FnOnce1 {
 
 impl<T, R> FnOnce1 for T
 where
-    T: FnOnce(()) -> R,
+    T: FnOnce() -> R,
 {
     type Output = R;
 }
 
 fn main() {
-    let bodies = map(|url| Wrap(Result::Ok(url)));
+    let bodies = map(|| Wrap(Result::Ok(())));
 
     bodies.for_each(|b| async {
         match b {
