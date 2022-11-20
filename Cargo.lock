@@ -14,7 +14,6 @@ version = "0.4.0-alpha.0"
 dependencies = [
  "futures-core",
  "futures-io",
- "futures-sink",
  "futures-task",
  "futures-util",
 ]
@@ -37,10 +36,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "futures-sink"
-version = "0.4.0-alpha.0"
-
-[[package]]
 name = "futures-task"
 version = "0.4.0-alpha.0"
 
@@ -51,7 +46,6 @@ dependencies = [
  "futures-core",
  "futures-io",
  "futures-macro",
- "futures-sink",
  "futures-task",
  "memchr",
  "pin-project-lite",
