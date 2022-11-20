@@ -49,8 +49,7 @@ mod fut {
         type Item = String;
     }
 
-    pub struct Map<St, F> {
-        stream: St,
+    pub struct Map<F> {
         f: F,
     }
 
@@ -69,7 +68,7 @@ mod fut {
         }
     }
 
-    impl<St, F> Stream for Map<St, F>
+    impl<St, F> Stream for Map<F>
     where
         St: Stream,
         F: FnOnce1<St::Item>,
