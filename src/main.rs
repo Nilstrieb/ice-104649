@@ -5,18 +5,14 @@ use std::{
     task::{Context, Poll},
 };
 
-pub struct JoinHandle<T>(T);
+pub struct FutResult<T>(T);
 
-impl<T> Future for JoinHandle<T> {
+impl<T> Future for FutResult<T> {
     type Output = Result<T, ()>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         loop {}
     }
-}
-
-pub fn spawn<T>(future: T) -> JoinHandle<T> {
-    loop {}
 }
 
 mod fut {
@@ -46,7 +42,7 @@ mod fut {
             loop {}
         }
 
-        fn buffer_unordered(self, n: impl Into<Option<usize>>) -> BufferUnordered<Self>
+        fn buffer_unordered(self) -> BufferUnordered<Self>
         where
             Self::Item: Future,
             Self: Sized,
@@ -55,24 +51,10 @@ mod fut {
         }
     }
 
-    pub struct Iter<I> {
-        iter: I,
-    }
+    pub struct Empty;
 
-    pub fn iter<I>(i: I) -> Iter<I::IntoIter>
-    where
-        I: IntoIterator,
-    {
-        Iter {
-            iter: i.into_iter(),
-        }
-    }
-
-    impl<I> Stream for Iter<I>
-    where
-        I: Iterator,
-    {
-        type Item = I::Item;
+    impl Stream for Empty {
+        type Item = String;
     }
 
     pub struct Map<St, F> {
@@ -139,9 +121,9 @@ mod fut {
 }
 
 fn main() {
-    let bodies = fut::iter([])
-        .map(|url: String| spawn(Result::Ok(url)))
-        .buffer_unordered(0);
+    let bodies = fut::Empty
+        .map(|url| FutResult(Result::Ok(url)))
+        .buffer_unordered();
 
     bodies.for_each(|b| async {
         match b {
