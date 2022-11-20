@@ -13,7 +13,6 @@ name = "futures"
 version = "0.4.0-alpha.0"
 dependencies = [
  "futures-core",
- "futures-io",
  "futures-task",
  "futures-util",
 ]
@@ -21,10 +20,6 @@ dependencies = [
 [[package]]
 name = "futures-core"
 version = "1.0.0-alpha.0"
-
-[[package]]
-name = "futures-io"
-version = "0.3.25"
 
 [[package]]
 name = "futures-macro"
@@ -44,10 +39,8 @@ name = "futures-util"
 version = "0.4.0-alpha.0"
 dependencies = [
  "futures-core",
- "futures-io",
  "futures-macro",
  "futures-task",
- "memchr",
  "pin-project-lite",
  "pin-utils",
  "slab",
@@ -59,12 +52,6 @@ version = "0.1.0"
 dependencies = [
  "futures",
 ]
-
-[[package]]
-name = "memchr"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "pin-project-lite"
