@@ -11,7 +11,7 @@ impl<T> Project for FutResult<T> {
 pub trait Stream {
     type Item;
 
-    fn for_each<Fut, F>(self, f: F) -> ForEach<F>
+    fn for_each<Fut, F>(self, f: F)
     where
         F: FnMut(Self::Item) -> Fut,
         Self: Sized,
@@ -46,10 +46,6 @@ where
     F::Output: Project,
 {
     type Item = <F::Output as Project>::Assoc;
-}
-
-pub struct ForEach<F> {
-    f: F,
 }
 
 fn main() {
