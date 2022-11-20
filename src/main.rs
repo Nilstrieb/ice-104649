@@ -1,18 +1,13 @@
 use fut::Stream;
-use std::{
-    future::Future,
-    pin::Pin,
-    task::{Context, Poll},
-};
+
+trait Project {
+    type Assoc;
+}
 
 pub struct FutResult<T>(T);
 
-impl<T> Future for FutResult<T> {
-    type Output = Result<T, ()>;
-
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        loop {}
-    }
+impl<T> Project for FutResult<T> {
+    type Assoc = Result<T, ()>;
 }
 
 mod fut {
@@ -21,6 +16,8 @@ mod fut {
         pin::Pin,
         task::{Context, Poll},
     };
+
+    use crate::Project;
 
     pub trait Stream {
         type Item;
@@ -62,28 +59,15 @@ mod fut {
     impl<F> Stream for Map<F>
     where
         F: FnOnce1<String>,
-        F::Output: Future,
+        F::Output: Project,
     {
-        type Item = <F::Output as Future>::Output;
+        type Item = <F::Output as Project>::Assoc;
     }
 
     pub struct ForEach<St, Fut, F> {
         stream: St,
         f: F,
         future: Option<Fut>,
-    }
-
-    impl<St, Fut, F> Future for ForEach<St, Fut, F>
-    where
-        St: Stream,
-        F: FnMut(St::Item) -> Fut,
-        Fut: Future<Output = ()>,
-    {
-        type Output = ();
-
-        fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
-            loop {}
-        }
     }
 }
 
